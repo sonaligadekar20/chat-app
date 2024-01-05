@@ -43,4 +43,35 @@ app.post("/api/signup", async (req, res)=>{
            message: err.message 
         })
     }
+});
+
+app.post("/api/login", async(req, res)=>{
+    const {email, password} = req.body;
+
+    if (!email || !password) {
+        return res.json({
+            success: false,
+            message: "email or password is invalid"
+        })
+    }
+
+    const loginuser = await User.findOne({email, password:md5(password)});
+    if ( loginuser){
+        res.status(201).json({
+            success: true,
+            data:loginuser,
+            message: "login successful."
+        })
+    }
+    else {
+         res.status(404).json({
+            success: false,
+            message: "invalid data"
+         })
+    }
 })
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+});
