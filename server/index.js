@@ -2,10 +2,25 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
-import User from './model/User';
+import {Server} from "socket.io";
 
 const app = express ();
 app.use(express.json);
+
+// socket
+const io = new Server(5002, {
+    cors: {
+        origin : '*',
+    },
+});
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  io.on('message', (data)=>{
+    console.log(data);
+  })
+});
 
 const connectDB = async ()=>{
     try{
@@ -71,7 +86,7 @@ app.post("/api/login", async(req, res)=>{
     }
 })
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 });
