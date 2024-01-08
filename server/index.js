@@ -17,10 +17,17 @@ const io = new Server(5002, {
 io.on('connection', (socket) => {
   console.log('a user connected');
 
-  io.on('message', (data)=>{
+  socket.on('message', (data)=>{
     console.log(data);
   })
 });
+
+app.get('/sendMessage', (req, res) =>{
+    const {message} = req.query;
+    io.emit('receive', message);
+
+    res.status(200).json({message: 'Message sent'});
+})
 
 const connectDB = async ()=>{
     try{
