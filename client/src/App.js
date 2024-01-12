@@ -39,7 +39,6 @@ function App() {
               <p>{message.message}</p>
               <hr/>
               </div>
-
           })
         }
         
