@@ -1,25 +1,61 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+import { io } from "socket.io-client"
+
+const socket = io("http://localhost:5002")
 
 function App() {
+  const [message, setMessage] = useState();
+  const [messages, setMessages] = useState();
+
+  /*
+  {
+      sender: 'sender',
+      receiver:'receiver',
+      message: 'message',
+      timestamp: 'timestamp'
+  }
+  */
+    
+  useEffect(() => {
+    socket.on('message', (data) =>{
+      const newMessages = [...messages, data];
+      console.log(newMessages);
+      setMessages(newMessages);
+    });
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <div>
+        <h1>Chat App</h1>
+
+        <input type = "text" placeholder='Enter messages'
+        onChange={(e) => setMessage (e.target.value)}
+        value={message} />
+
+        {
+          messages.map((message) =>{
+            <div key={message.timestamp}>
+              <p>{message.timestamp}</p>
+              <p>{message.message}</p>
+              <hr/>
+              </div>
+
+          })
+        }
+        
+        <button onClick={() =>{
+          socket.emit('message',{
+            sender: 'sender',
+            receiver:'receiver',
+            message,
+            timestamp: new Date().toISOString(),
+        });
+        setMessage('');
+        }}> Send Message</button>
+
+      </div>
+    </>
+  )
 }
 
-export default App;
+export default App
