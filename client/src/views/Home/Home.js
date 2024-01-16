@@ -1,11 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import { io } from "socket.io-client"
+import { io } from "socket.io-client";
+import axios from 'axios';
+import "./Home.css";
 
 const socket = io("http://localhost:5002")
 
 function Home() {
   const [message, setMessage] = useState();
   const [messages, setMessages] = useState();
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] =useState();
+  
 
   /*
   {
@@ -15,14 +20,26 @@ function Home() {
       timestamp: 'timestamp'
   }
   */
+
+  const loadUsers = async () =>{
+    try {
+      const {data} = await axios.get('/users');
+      setUsers(data.data);
+    }catch (error) {
+      console.log(error);
+    }
+  }
     
   useEffect(() => {
-    socket.on('message', (data) =>{
-      const newMessages = [...messages, data];
-      console.log(newMessages);
-      setMessages(newMessages);
-    });
-  }, []);
+  loadUsers();
+  },
+   []);
+
+   socket.on('message', (data) =>{
+    const newMessages = [...messages, data];
+    console.log(newMessages);
+    setMessages(newMessages);
+  });
   return (
     <>
       <div>
